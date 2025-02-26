@@ -1,26 +1,27 @@
-# Entity and Relation Extraction
-Based on pure and a special relation, this project attempts to extract a nested event from the relation, and proposes solutions for nested events below three arguments, trigger nested extraction in relation extraction and sub-event overlapping extraction in event extraction.
+# 事件提取
+本项目尝试基于 pure 模型和一个特别关系的设定提出提取完整事件提出新方案，对三个论元以下的嵌套事件、关系提取中的触发器嵌套提取问题以及事件提取的子事件重叠提取问题提出了解决方案。
 <img src="./figs/test2.png">
 
-## introduce
-The dotted red line indicates the Cause relationship, the dotted green line indicates the Theme relationship, and the solid blue line indicates the val_connect relationship. By selecting one of the nested events, the "p300" connection with the val_connect relation type and "recruitment" and the "recruitment" connection with the theme relation type and "p300" fully identify the nested child event. "p300" determines that the nested subevent belongs to the nested event by connecting with "interfere" through the val_connect relation type, "interfere" with "recruitment" through the theme relation type, and the determination of the nested subevent. "Foxp3" corresponding to the Cause relation type can be the object of both the cause relation type of "interfer" and the val_connect relation type of "p300".
+## 介绍
+其中其中红色虚线代表 Cause 关系，绿色虚线代表Theme 关系，蓝色实线代表 val_connect 关系。通过选取其中一个嵌套事件，“p300”以 val_connect 关系类型和“recruitment”连接与“recruitment”以 theme 关系类型与“p300”连接完整的确定了这个嵌套子事件，“p300”通过 val_connect 关系类型与“interfere”连接、“interfere”以 theme 关系类型与“recruitment”连接以及嵌套子事件的确定，确定了这个嵌套子事件属于这个嵌套事件，而 Cause 关系类型对应的 Foxp3 只要同时作为“interfer”的cause关系类型的客体以及“p300”的 val_connect 关系类型的客体。
 <img src="./figs/rel.jpg">
-This project can determine that "Foxp3" is the corresponding argument of "interfer". And confirmed his uniqueness. You can see that the nested event is uniquely determined by the trigger "interfere" and the argument "p300" of the nested child event, giving a unique result. However, there is a problem that each additional relationship construction forms one ring after another, which will affect the result of relationship extraction. Therefore, the idea of pure model is adopted here to carry out each relationship extraction independently, so as to ensure that each relationship can be effectively extracted
+本文就可以确定这个“Foxp3”是“interfer”的相应的论元。并且确定了他的唯一性。可以看到通过触发器“interfere”和嵌套子事件的论元”p300”唯一的确定这个嵌套事件，得到一个唯一的结果。但是其中存在着一个问题就是每一次的额外关系构建都构成了一个又一个的环，会影响关系提取的结果，所以这里采用 pure 模型的思路独立的进行每一次关系提取，从而保证每一个关系都能有效的提取。
 <img src="./figs/rel_table.png">
-## setup
 
-### Install dependencies
-Please install all the dependency packages using the following command:
+## 实现过程
+
+### 安装依赖包
+安装依赖包:
 ```
 pip install -r requirements.txt
 ```
 
-### Download and preprocess the datasets
-Our experiments are based on three datasets: genia11. Please find the links and pre-processing below:
-* genia11: We use the preprocessing code from [genia11](https://bionlp-st.dbcls.jp/GE/2011/downloads/).
+### 下载数据集并预处理
+在此处下载genia11，处理方式如OneEE:
+* genia11: [genia11](https://bionlp-st.dbcls.jp/GE/2011/downloads/).
 
-## Quick Start
-The trained model can be downloaded from here. You need to unzip decompress it before running the program.
+## 方法实现
+.
 
 ```bash
 
@@ -46,13 +47,13 @@ python run_relation.py \
   
 # Output end-to-end evaluation results
 python run_eval.py --prediction_file ${genia11_rel_model}/predictions.json
+```
 
+## 实体提取模型
 
-## Entity Model
+### 实体提取模型的输入数据的格式
 
-### Input data format for the entity model
-
-The input data format of the entity model is JSONL. Each line of the input file contains one document in the following format.
+实体模型的输入数据格式为JSONL。输入文件的每一行都包含一个以下格式的文档。
 ```
 {
     "doc_key": 1032887401,
@@ -152,10 +153,9 @@ The input data format of the entity model is JSONL. Each line of the input file 
 }
 ```
 
-### Train/evaluate the entity model
+### 训练/评估实体提取模型
 
-You can use `run_entity.py` with `--do_train` to train an entity model and with `--do_eval` to evaluate an entity model.
-A trianing command template is as follow:
+训练:
 ```bash
 python run_entity.py \
     --do_train --do_eval [--eval_test] \
@@ -174,11 +174,11 @@ Arguments:
 * `--model`: the base transformer model. We use `allenai/scibert_scivocab_uncased` for SciERC.
 * `--eval_test`: whether evaluate on the test set or not.
 
-The predictions of the entity model will be saved as a file (`ent_pred_dev.json`) in the `output_dir` directory. If you set `--eval_test`, the predictions (`ent_pred_test.json`) are on the test set. The prediction file of the entity model will be the input file of the relation model.
+实体模型的预测将被保存在"output_dir"目录下的"ent_pred_dev.json"。如果设置'--eval_test '在测试集中预测"ent_pred_test.json",实体模型的预测文件将成为关系模型的输入文件。
 
-## Relation Model
-### Input data format for the relation model
-The input data format of the relation model is almost the same as that of the entity model, except that there is one more filed `."predicted_ner"` to store the predictions of the entity model.
+## 关系提取模型
+### 关系提取模型的数据输入的格式
+关系模型的输入数据格式与实体模型的输入数据格式几乎相同，只是多了一个字段。"predicted_ner"来存储实体模型的预测,用于关系预测，并且通过多余的关系val_connect能够直接得到一个事件。
 ```bash
 {
     "doc_key": 889290301,
@@ -256,8 +256,8 @@ The input data format of the relation model is almost the same as that of the en
 }
 ```
 
-### Train/evaluate the relation model:
-You can use `run_relation.py` with `--do_train` to train a relation model and with `--do_eval` to evaluate a relation model. A trianing command template is as follow:
+### 训练/评估关系提取模型
+训练：
 ```bash
 python run_relation.py \
   --task {genia11} \
@@ -278,20 +278,16 @@ Aruguments:
 * `--eval_with_gold`: whether evaluate the model with the gold entities provided.
 * `--entity_output_dir`: the output directory of the entity model. The prediction files (`ent_pred_dev.json` or `ent_pred_test.json`) of the entity model should be in this directory.
 
-The prediction results will be stored in the file `predictions.json` in the folder `output_dir`, and the format will be almost the same with the output file from the entity model, except that there is one more field `"predicted_relations"` for each document.
+预测结果将存储在"output_dir"文件夹中的"predictions.json"中，格式将与实体模型的输出文件每个文档多一个字段"predicted_relations"。
 
-You can run the evaluation script to output the end-to-end performance  (`Ent`, `Rel`, and `Rel+`) of the predictions.
+通过额外的关系唯一确定两个实体从而确定唯一的事件
 ```bash
 python run_eval.py --prediction_file {path to output_dir}/predictions.json
 ```
 
-
-
-## Pre-trained Models
-We release our pre-trained entity models and relation models for genia11 datasets.
-
-*Note*: the performance of the pre-trained models might be slightly different from the reported numbers in the paper, since we reported the average numbers based on multiple runs.
-
-### Pre-trained models for genia11
+### 预训练模型
 * [SciBERT (cross, W=300)](https://nlp.cs.princeton.edu/projects/pure/scierc_models/ent-scib-ctx300.zip) (391M): Cross-sentence entity model based on `allenai/scibert_scivocab_uncased`
+
+## 总结
   
+针对事件提取如何提取嵌套子事件，验证子事件与嵌套子事件之间的关系提供了新的构建方法。将事件提取模块融入了关系提取模块，加强了关系对之间的联系。证明了两论元的完整事件提取范式，针对嵌套事件提取提出了解决方案。但是三论元及以上还不能完整提取，只能按照 GE11数据集的特点进行特殊事件处理（GE11存在唯一的两个实体作为我们定位整个事件的方式。）通过与现有模型对比，证明了该方法在触发器论元识别上实现了竞争性能，在论元角色识别上实现了最好的效果，在嵌套事件的提取上有一定的性能提升。
