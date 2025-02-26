@@ -1,0 +1,13 @@
+python run_relation.py \
+  --task genia \
+  --do_eval --eval_test \
+  --model scibert_scivocab_uncased \
+  --do_lower_case \
+  --train_batch_size 32 \
+  --eval_batch_size 32 \
+  --learning_rate 2e-5 \
+  --num_train_epochs 10 \
+  --context_window 100 \
+  --max_seq_length 228 \
+  --entity_output_dir ./data/ent_output/predict/gold/merge \
+  --output_dir ./data/rela_output/predict
