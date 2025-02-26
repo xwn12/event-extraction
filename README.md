@@ -294,4 +294,4 @@ We release our pre-trained entity models and relation models for genia11 dataset
 
 ### Pre-trained models for genia11
 * [SciBERT (cross, W=300)](https://nlp.cs.princeton.edu/projects/pure/scierc_models/ent-scib-ctx300.zip) (391M): Cross-sentence entity model based on `allenai/scibert_scivocab_uncased`
-
+  
